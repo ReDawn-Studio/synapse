@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [tokenInput, setTokenInput] = useState('');
-  const { setToken } = useApi();
+  const { setToken, request, handleError } = useApi();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,21 +16,29 @@ export default function Login() {
       return;
     }
 
-    // 验证 token 是否有效
+    setLoading(true);
+    setError('');
+
     try {
-      const res = await fetch('/api/v1/auth/me', {
+      await request('/auth/me', {
         headers: { 'Authorization': `Bearer ${tokenInput}` }
       });
-      if (res.ok) {
+      setToken(tokenInput);
+      navigate('/channels');
+    } catch (err) {
+      const apiError = handleError(err);
+      
+      if (apiError.type === 'AUTH_REQUIRED' || apiError.statusCode === 401) {
+        setError('Token 无效，请检查后重试');
+      } else if (apiError.type === 'NETWORK_ERROR') {
+        // 如果无法连接后端，也允许登录（开发模式）
         setToken(tokenInput);
         navigate('/channels');
       } else {
-        setError('Token 无效，请检查后重试');
+        setError(apiError.message);
       }
-    } catch {
-      // 如果无法连接后端，也允许登录（开发模式）
-      setToken(tokenInput);
-      navigate('/channels');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,18 +61,29 @@ export default function Login() {
               onChange={(e) => setTokenInput(e.target.value)}
               placeholder="sk_xxxxx"
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              disabled={loading}
             />
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              ⚠️ {error}
+            </div>
           )}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            登录
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                验证中...
+              </>
+            ) : (
+              '登录'
+            )}
           </button>
         </form>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useApi } from '../hooks/useApi';
+import { useApi, type ApiError } from '../hooks/useApi';
 import { Link } from 'react-router-dom';
+import { SkeletonList } from '../components/ui/Skeleton';
 
 interface Channel {
   id: string;
@@ -11,10 +12,10 @@ interface Channel {
 }
 
 export default function Channels() {
-  const { token, apiUrl, setToken } = useApi();
+  const { token, setToken, request, handleError } = useApi();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [newChannelDesc, setNewChannelDesc] = useState('');
@@ -22,26 +23,18 @@ export default function Channels() {
 
   useEffect(() => {
     if (!token) return;
-
     loadChannels();
-  }, [token, apiUrl]);
+  }, [token]);
 
   const loadChannels = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/channels`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!res.ok) {
-        throw new Error('加载频道失败');
-      }
-      
-      const data = await res.json();
+      const data = await request<Channel[]>('/channels');
       setChannels(Array.isArray(data) ? data : (data.channels || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      const apiError = handleError(err);
+      setError(apiError);
       setChannels([]);
     } finally {
       setLoading(false);
@@ -54,12 +47,8 @@ export default function Channels() {
 
     try {
       setCreating(true);
-      const res = await fetch(`${apiUrl}/channels`, {
+      await request<Channel>('/channels', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({
           name: newChannelName.trim(),
           description: newChannelDesc.trim() || null,
@@ -67,18 +56,32 @@ export default function Channels() {
         })
       });
 
-      if (!res.ok) {
-        throw new Error('创建频道失败');
-      }
-
       await loadChannels();
       setShowCreateModal(false);
       setNewChannelName('');
       setNewChannelDesc('');
     } catch (err) {
-      alert(err instanceof Error ? err.message : '创建失败');
+      const apiError = handleError(err);
+      alert(getErrorMessage(apiError));
     } finally {
       setCreating(false);
+    }
+  };
+
+  const getErrorMessage = (apiError: ApiError): string => {
+    switch (apiError.type) {
+      case 'AUTH_REQUIRED':
+        return '登录已过期，请重新登录';
+      case 'FORBIDDEN':
+        return '权限不足';
+      case 'NOT_FOUND':
+        return '资源不存在';
+      case 'SERVER_ERROR':
+        return '服务器错误，请稍后重试';
+      case 'NETWORK_ERROR':
+        return '网络连接失败，请检查网络设置';
+      default:
+        return apiError.message || '操作失败';
     }
   };
 
@@ -86,13 +89,33 @@ export default function Channels() {
     setToken(null);
   };
 
+  const renderError = (apiError: ApiError) => {
+    const errorMessages: Record<string, string> = {
+      'AUTH_REQUIRED': '⚠️ 登录已过期，请重新登录',
+      'FORBIDDEN': '⚠️ 权限不足',
+      'NOT_FOUND': '⚠️ 资源不存在',
+      'SERVER_ERROR': '⚠️ 服务器错误，请稍后重试',
+      'NETWORK_ERROR': '⚠️ 网络连接失败，请检查网络设置',
+    };
+
+    return (
+      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        {errorMessages[apiError.type] || `⚠️ ${apiError.message}`}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-slate-500 mt-4">加载频道列表...</p>
-        </div>
+      <div className="min-h-screen bg-slate-50">
+        <header className="bg-white shadow-sm border-b border-slate-200">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <Skeleton height="32px" width="120px" />
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-4 py-6">
+          <SkeletonList count={5} height="80px" gap="16px" />
+        </main>
       </div>
     );
   }
@@ -120,13 +143,9 @@ export default function Channels() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            ⚠️ {error}
-          </div>
-        )}
+        {error && renderError(error)}
 
-        {channels.length === 0 ? (
+        {channels.length === 0 && !error ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📭</div>
             <p className="text-slate-500 mb-4">暂无频道</p>
