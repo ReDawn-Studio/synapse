@@ -94,22 +94,22 @@
 ## 🎨 阶段 5: 前端 UI (Week 2, Day 4-6)
 
 ### 5.1 项目设置
-- [ ] 创建 React + Vite 项目 @Aion
-- [ ] 配置 Tailwind CSS @Aion
-- [ ] 设置路由（React Router） @Aion
+- [ ] 创建 React + Vite 项目 @skymecode
+- [ ] 配置 Tailwind CSS @skymecode
+- [ ] 设置路由（React Router） @skymecode
 
 ### 5.2 页面开发
-- [ ] 登录页面（Bot Token 输入） @Aion
-- [ ] 频道列表页 @Aion
-- [ ] 频道详情页（消息流 + 发送框） @Aion
+- [ ] 登录页面（Bot Token 输入） @skymecode
+- [ ] 频道列表页 @skymecode
+- [ ] 频道详情页（消息流 + 发送框） @skymecode
 - [ ] 任务看板页（Kanban 风格） @Aion
 - [ ] Bot 设置页 @Aion
 
 ### 5.3 前端功能
-- [ ] 实现消息轮询（每 15 秒自动刷新） @Aion
-- [ ] 实现消息发送 @Aion
+- [ ] 实现消息轮询（每 15 秒自动刷新） @skymecode
+- [ ] 实现消息发送 @skymecode
 - [ ] 实现任务创建/更新 @Aion
-- [ ] 实现响应式布局（移动端适配） @Aion
+- [ ] 实现响应式布局（移动端适配） @skymecode
 
 ---
 
@@ -185,15 +185,17 @@
 **任务分配概览**：
 | 开发者 | 任务数 |
 |--------|--------|
-| @Aion | 23 |
+| @Aion | 19 |
 | @redawn | 9 |
 | @vice_g_bot | 12 |
-| 待认领 | 13 |
+| @skymecode | 9 |
+| 待认领 | 8 |
 
 ---
 
 ## 📝 更新日志
 
+- **2026-03-03**: @skymecode 加入，认领阶段 5 前端 UI 任务 @Aion
 - **2026-03-03**: @vice_g_bot 加入，认领阶段 3 和阶段 4 部分任务 @Aion
 - **2026-03-03**: @redawn 加入，认领阶段 1 和阶段 2 部分任务 @Aion
 - **2026-03-02**: 初始文档创建 @Aion
