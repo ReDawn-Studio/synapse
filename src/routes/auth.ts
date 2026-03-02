@@ -24,6 +24,12 @@ const refreshSchema = z.object({
   }),
 });
 
+const logoutSchema = z.object({
+  body: z.object({
+    refresh_token: z.string(),
+  }),
+});
+
 export default async function authRoutes(fastify: FastifyInstance) {
   // Bot 注册
   fastify.post('/register', async (request: FastifyRequest<{ Body: { name: string; description?: string; public_key?: string } }>, reply: FastifyReply) => {
@@ -80,7 +86,18 @@ export default async function authRoutes(fastify: FastifyInstance) {
     const accessToken = fastify.jwt.sign({ bot_id: bot.id, bot_name: bot.name });
     const refreshToken = `synapse_rt_${Buffer.from(crypto.randomUUID()).toString('base64').slice(0, 32)}`;
 
-    // TODO: 存储 refresh_token 以便后续验证和撤销
+    // 存储 refresh_token hash（30 天过期）
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 天
+
+    await db
+      .insertInto('bot_refresh_tokens')
+      .values({
+        bot_id: bot.id,
+        token_hash: refreshTokenHash,
+        expires_at: expiresAt,
+      })
+      .execute();
 
     reply.send({
       access_token: accessToken,
@@ -95,12 +112,86 @@ export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post('/refresh', async (request: FastifyRequest<{ Body: { refresh_token: string } }>, reply: FastifyReply) => {
     const { refresh_token } = request.body;
 
-    // TODO: 验证 refresh_token 是否有效且未过期
+    // 验证 refresh_token 格式
+    if (!refresh_token.startsWith('synapse_rt_')) {
+      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token format' });
+    }
+
+    // 查找 token 记录
+    const tokens = await db
+      .selectFrom('bot_refresh_tokens')
+      .selectAll()
+      .execute();
+
+    // 验证 token 是否有效（需要遍历比较 hash）
+    let validToken: any = null;
+    let tokenBotId: string | null = null;
+
+    for (const tokenRecord of tokens) {
+      const isValid = await bcrypt.compare(refresh_token, tokenRecord.token_hash);
+      if (isValid) {
+        // 检查是否过期
+        if (new Date(tokenRecord.expires_at) < new Date()) {
+          return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Refresh token expired' });
+        }
+
+        // 检查是否已撤销
+        if (tokenRecord.revoked_at !== null) {
+          return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Refresh token revoked' });
+        }
+
+        validToken = tokenRecord;
+        tokenBotId = tokenRecord.bot_id;
+        break;
+      }
+    }
+
+    if (!validToken || !tokenBotId) {
+      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token' });
+    }
+
+    // 获取 bot 信息
+    const bot = await db
+      .selectFrom('bots')
+      .where('id', '=', tokenBotId)
+      .select(['id', 'name'])
+      .executeTakeFirst();
+
+    if (!bot) {
+      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Bot not found' });
+    }
 
     // 生成新的 access_token
-    // 简化实现：实际应从 refresh_token 中提取 bot_id
-    const accessToken = fastify.jwt.sign({ bot_id: 'unknown', bot_name: 'unknown' });
+    const accessToken = fastify.jwt.sign({ bot_id: bot.id, bot_name: bot.name });
     const newRefreshToken = `synapse_rt_${Buffer.from(crypto.randomUUID()).toString('base64').slice(0, 32)}`;
+
+    // 存储新的 refresh_token
+    const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
+    const newExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 天
+
+    // 撤销旧 token
+    await db
+      .updateTable('bot_refresh_tokens')
+      .where('id', '=', validToken.id)
+      .set({ revoked_at: new Date() })
+      .execute();
+
+    // 插入新 token
+    await db
+      .insertInto('bot_refresh_tokens')
+      .values({
+        bot_id: bot.id,
+        token_hash: newRefreshTokenHash,
+        expires_at: newExpiresAt,
+      })
+      .execute();
+
+    // 更新 last_used_at
+    await db
+      .updateTable('bot_refresh_tokens')
+      .where('id', '=', validToken.id)
+      .set({ last_used_at: new Date() })
+      .execute();
 
     reply.send({
       access_token: accessToken,
@@ -108,5 +199,32 @@ export default async function authRoutes(fastify: FastifyInstance) {
       token_type: 'Bearer',
       expires_in: 900,
     });
+  });
+
+  // 登出（撤销 token）
+  fastify.post('/logout', async (request: FastifyRequest<{ Body: { refresh_token: string } }>, reply: FastifyReply) => {
+    const { refresh_token } = request.body;
+
+    // 查找并撤销 token
+    const tokens = await db
+      .selectFrom('bot_refresh_tokens')
+      .selectAll()
+      .execute();
+
+    for (const tokenRecord of tokens) {
+      const isValid = await bcrypt.compare(refresh_token, tokenRecord.token_hash);
+      if (isValid) {
+        await db
+          .updateTable('bot_refresh_tokens')
+          .where('id', '=', tokenRecord.id)
+          .set({ revoked_at: new Date() })
+          .execute();
+
+        return reply.send({ success: true, message: 'Logged out successfully' });
+      }
+    }
+
+    // 即使 token 无效也返回成功（防止枚举）
+    reply.send({ success: true, message: 'Logged out successfully' });
   });
 }

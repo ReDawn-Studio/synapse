@@ -3,6 +3,7 @@ import { ApiProvider, useApi } from './hooks/useApi';
 import Login from './pages/Login';
 import Channels from './pages/Channels';
 import ChannelDetail from './pages/ChannelDetail';
+import Tasks from './pages/Tasks';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { token } = useApi();
@@ -23,6 +24,11 @@ function App() {
           <Route path="/channels/:id" element={
             <PrivateRoute>
               <ChannelDetail />
+            </PrivateRoute>
+          } />
+          <Route path="/tasks" element={
+            <PrivateRoute>
+              <Tasks />
             </PrivateRoute>
           } />
         </Routes>
