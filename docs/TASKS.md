@@ -18,21 +18,21 @@
 ## 🏗️ 阶段 1: 项目初始化 (Week 1, Day 1-2)
 
 ### 1.1 仓库与基础配置
-- [ ] 创建项目骨架（Node.js + TypeScript） @Aion
-- [ ] 配置 ESLint + Prettier @Aion
-- [ ] 编写 README.md @Aion
-- [ ] 创建 Dockerfile @Aion
-- [ ] 创建 docker-compose.yml @Aion
+- [x] 创建项目骨架（Node.js + TypeScript） @Aion
+- [ ] 配置 ESLint + Prettier @redawn
+- [x] 编写 README.md @Aion
+- [x] 创建 Dockerfile @Aion
+- [x] 创建 docker-compose.yml @Aion
 
 ### 1.2 数据库设计
-- [ ] 设计 PostgreSQL schema（bots, channels, messages, tasks 表） @Aion
-- [ ] 编写数据库迁移脚本（使用 prisma 或 knex） @Aion
-- [ ] 创建数据库初始化 SQL @Aion
+- [x] 设计 PostgreSQL schema（bots, channels, messages, tasks 表） @Aion
+- [ ] 编写数据库迁移脚本（使用 kysely） @redawn
+- [ ] 创建数据库初始化 SQL @redawn
 
 ### 1.3 项目文档
-- [ ] 编写 API 文档草稿（OpenAPI/Swagger） @Aion
-- [ ] 编写贡献指南 CONTRIBUTING.md @Aion
-- [ ] 编写部署指南 DEPLOYMENT.md @Aion
+- [x] 编写 API 文档草稿 @Aion
+- [ ] 编写贡献指南 CONTRIBUTING.md @redawn
+- [ ] 编写部署指南 DEPLOYMENT.md @redawn
 
 ---
 
@@ -40,13 +40,14 @@
 
 ### 2.1 Bot 注册与认证
 - [ ] 实现 `POST /api/v1/auth/register` - Bot 注册 @Aion
-- [ ] 实现 `POST /api/v1/auth/token` - 获取 API Token @Aion
+- [ ] 实现 `POST /api/v1/auth/login` - 登录获取 Token @redawn
+- [ ] 实现 `POST /api/v1/auth/refresh` - 刷新 Token @redawn
 - [ ] 实现 Token 验证中间件 @Aion
 - [ ] 实现速率限制（60 次/分钟） @Aion
 
 ### 2.2 认证测试
-- [ ] 编写认证 API 单元测试 @Aion
-- [ ] 编写 Postman 测试集合 @Aion
+- [ ] 编写认证 API 单元测试 @redawn
+- [ ] 编写 Postman 测试集合 @redawn
 
 ---
 
@@ -171,7 +172,7 @@
 
 | 阶段 | 任务数 | 完成数 | 进度 |
 |------|--------|--------|------|
-| 阶段 1: 项目初始化 | 8 | 0 | 0% |
+| 阶段 1: 项目初始化 | 8 | 5 | 63% |
 | 阶段 2: 认证系统 | 6 | 0 | 0% |
 | 阶段 3: 频道与消息 | 8 | 0 | 0% |
 | 阶段 4: 任务系统 | 8 | 0 | 0% |
@@ -179,12 +180,13 @@
 | 阶段 6: 文档与示例 | 6 | 0 | 0% |
 | 阶段 7: 测试与优化 | 6 | 0 | 0% |
 | 阶段 8: 发布准备 | 6 | 0 | 0% |
-| **总计** | **57** | **0** | **0%** |
+| **总计** | **57** | **5** | **9%** |
 
 ---
 
 ## 📝 更新日志
 
+- **2026-03-03**: @redawn 加入，认领阶段 1 和阶段 2 部分任务 @Aion
 - **2026-03-02**: 初始文档创建 @Aion
 
 ---
