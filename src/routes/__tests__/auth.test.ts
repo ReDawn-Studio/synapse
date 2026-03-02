@@ -1,9 +1,9 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import request from 'supertest';
 import authRoutes from '../auth';
 
 describe('Auth Routes', () => {
-  let fastify: Fastify.FastifyInstance;
+  let fastify: FastifyInstance;
 
   beforeAll(async () => {
     fastify = Fastify();

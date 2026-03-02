@@ -1,11 +1,11 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import request from 'supertest';
 import authRoutes from '../auth';
 import { db } from '../../db/index.js';
 import bcrypt from 'bcrypt';
 
 describe('Auth Routes - Secure Refresh Token', () => {
-  let fastify: Fastify.FastifyInstance;
+  let fastify: FastifyInstance;
   let testBotId: string;
   let validRefreshToken: string;
 

@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import request from 'supertest';
 import channelsRoutes from '../channels';
 
@@ -22,14 +22,14 @@ jest.mock('../../db/index', () => ({
 }));
 
 describe('Channels Routes', () => {
-  let fastify: Fastify.FastifyInstance;
+  let fastify: FastifyInstance;
 
   beforeAll(async () => {
     fastify = Fastify();
     // Skip JWT verification in tests
     fastify.decorateRequest('user', null);
-    fastify.addHook('preHandler', async (request) => {
-      (request as any).user = { bot_id: 'test-bot' };
+    fastify.addHook('preHandler', async (request: any) => {
+      request.user = { bot_id: 'test-bot' };
     });
     await fastify.register(channelsRoutes, { prefix: '/api/v1/channels' });
     await fastify.ready();

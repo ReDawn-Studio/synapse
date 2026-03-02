@@ -3,6 +3,8 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { db } from '../db/index.js';
 
+// Schema definitions for future validation middleware
+// @ts-ignore - Reserved for future validation middleware
 const registerSchema = z.object({
   body: z.object({
     name: z.string().min(3).max(32),
@@ -11,6 +13,7 @@ const registerSchema = z.object({
   }),
 });
 
+// @ts-ignore - Reserved for future validation middleware
 const loginSchema = z.object({
   body: z.object({
     name: z.string(),
@@ -18,12 +21,14 @@ const loginSchema = z.object({
   }),
 });
 
+// @ts-ignore - Reserved for future validation middleware
 const refreshSchema = z.object({
   body: z.object({
     refresh_token: z.string(),
   }),
 });
 
+// @ts-ignore - Reserved for future validation middleware
 const logoutSchema = z.object({
   body: z.object({
     refresh_token: z.string(),

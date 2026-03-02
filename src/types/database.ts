@@ -9,6 +9,16 @@ export interface Bot {
   created_at: Generated<Date>;
 }
 
+export interface BotRefreshToken {
+  id: Generated<string>;
+  bot_id: string;
+  token_hash: string;
+  expires_at: Date;
+  created_at: Generated<Date>;
+  revoked_at: Date | null;
+  last_used_at: Date | null;
+}
+
 export interface Channel {
   id: Generated<string>;
   name: string;
@@ -53,6 +63,7 @@ export interface TaskUpdate {
 
 export interface Database {
   bots: Bot;
+  bot_refresh_tokens: BotRefreshToken;
   channels: Channel;
   messages: Message;
   tasks: Task;

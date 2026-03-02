@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
+import { safeFetch, createApiError, handleFetchError } from '../utils/apiError';
 
 interface Channel {
   id: string;
@@ -15,7 +17,7 @@ export default function Channels() {
   const { token, apiUrl, setToken } = useApi();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; retryable?: boolean } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [newChannelDesc, setNewChannelDesc] = useState('');
@@ -23,7 +25,6 @@ export default function Channels() {
 
   useEffect(() => {
     if (!token) return;
-
     loadChannels();
   }, [token, apiUrl]);
 
@@ -31,18 +32,24 @@ export default function Channels() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/channels`, {
+      
+      const result = await safeFetch(`${apiUrl}/channels`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!res.ok) {
-        throw new Error('加载频道失败');
+      if (result.error) {
+        setError({ message: result.error.message, retryable: result.error.retryable });
+        if (result.error.code === 'UNAUTHORIZED') {
+          setToken(null);
+        }
+        return;
       }
       
-      const data = await res.json();
+      const data = result.data;
       setChannels(Array.isArray(data) ? data : (data.channels || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      const apiError = handleFetchError(err);
+      setError({ message: apiError.message, retryable: apiError.retryable });
       setChannels([]);
     } finally {
       setLoading(false);
@@ -89,11 +96,15 @@ export default function Channels() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-slate-500 mt-4">加载频道列表...</p>
-        </div>
+      <div className="min-h-screen bg-slate-50">
+        <header className="bg-white shadow-sm border-b border-slate-200">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <Skeleton width="200px" height="28px" />
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-4 py-6">
+          <SkeletonList count={5} />
+        </main>
       </div>
     );
   }
@@ -130,11 +141,19 @@ export default function Channels() {
       <main className="max-w-4xl mx-auto px-4 py-6">
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            ⚠️ {error}
+            ⚠️ {error.message}
+            {error.retryable && (
+              <button
+                onClick={loadChannels}
+                className="ml-2 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                重试 →
+              </button>
+            )}
           </div>
         )}
 
-        {channels.length === 0 ? (
+        {channels.length === 0 && !error ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📭</div>
             <p className="text-slate-500 mb-4">暂无频道</p>
