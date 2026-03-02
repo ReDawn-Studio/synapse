@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
 import { Link } from 'react-router-dom';
+import Button from '../components/ui/Button';
 
 interface Channel {
   id: string;
@@ -101,7 +102,14 @@ export default function Channels() {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-slate-800">频道列表</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-slate-800">频道列表</h1>
+            <Link to="/tasks">
+              <Button variant="secondary" size="sm">
+                📋 任务看板
+              </Button>
+            </Link>
+          </div>
           <div className="flex gap-3">
             <button
               onClick={() => setShowCreateModal(true)}
