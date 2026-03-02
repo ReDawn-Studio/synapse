@@ -54,19 +54,19 @@
 ## 💬 阶段 3: 频道与消息系统 (Week 1, Day 5-7)
 
 ### 3.1 频道 CRUD
-- [ ] 实现 `POST /api/v1/channels` - 创建频道 @Aion
-- [ ] 实现 `GET /api/v1/channels` - 列出频道 @Aion
-- [ ] 实现 `GET /api/v1/channels/:id` - 获取频道详情 @Aion
+- [ ] 实现 `POST /api/v1/channels` - 创建频道 @vice_g_bot
+- [ ] 实现 `GET /api/v1/channels` - 列出频道 @vice_g_bot
+- [ ] 实现 `GET /api/v1/channels/:id` - 获取频道详情 @vice_g_bot
 - [ ] 实现 `DELETE /api/v1/channels/:id` - 删除频道 @Aion
 
 ### 3.2 消息系统
-- [ ] 实现 `POST /api/v1/channels/:id/messages` - 发送消息 @Aion
-- [ ] 实现 `GET /api/v1/channels/:id/messages` - 获取消息历史 @Aion
+- [ ] 实现 `POST /api/v1/channels/:id/messages` - 发送消息 @vice_g_bot
+- [ ] 实现 `GET /api/v1/channels/:id/messages` - 获取消息历史 @vice_g_bot
 - [ ] **核心功能**: 实现 `GET /api/v1/channels/:id/messages?since=<timestamp>` - 轮询新消息 @Aion
-- [ ] 消息表索引优化（按 created_at） @Aion
+- [ ] 消息表索引优化（按 created_at） @vice_g_bot
 
 ### 3.3 消息测试
-- [ ] 编写消息 API 单元测试 @Aion
+- [ ] 编写消息 API 单元测试 @vice_g_bot
 - [ ] 编写轮询功能集成测试 @Aion
 
 ---
@@ -74,19 +74,19 @@
 ## 📋 阶段 4: 任务系统 (Week 2, Day 1-3)
 
 ### 4.1 任务 CRUD
-- [ ] 实现 `POST /api/v1/tasks` - 创建任务 @Aion
-- [ ] 实现 `GET /api/v1/tasks` - 列出任务（支持过滤） @Aion
-- [ ] 实现 `GET /api/v1/tasks/:id` - 获取任务详情 @Aion
+- [ ] 实现 `POST /api/v1/tasks` - 创建任务 @vice_g_bot
+- [ ] 实现 `GET /api/v1/tasks` - 列出任务（支持过滤） @vice_g_bot
+- [ ] 实现 `GET /api/v1/tasks/:id` - 获取任务详情 @vice_g_bot
 - [ ] 实现 `PATCH /api/v1/tasks/:id` - 更新任务状态 @Aion
 - [ ] 实现 `DELETE /api/v1/tasks/:id` - 删除任务 @Aion
 
 ### 4.2 任务状态机
 - [ ] 定义任务状态流转：`pending` → `in_progress` → `done/failed` @Aion
-- [ ] 实现状态变更验证 @Aion
-- [ ] 实现任务分配（assigned_to 数组） @Aion
+- [ ] 实现状态变更验证 @vice_g_bot
+- [ ] 实现任务分配（assigned_to 数组） @vice_g_bot
 
 ### 4.3 任务测试
-- [ ] 编写任务 API 单元测试 @Aion
+- [ ] 编写任务 API 单元测试 @vice_g_bot
 - [ ] 编写状态机测试 @Aion
 
 ---
@@ -182,10 +182,19 @@
 | 阶段 8: 发布准备 | 6 | 0 | 0% |
 | **总计** | **57** | **5** | **9%** |
 
+**任务分配概览**：
+| 开发者 | 任务数 |
+|--------|--------|
+| @Aion | 23 |
+| @redawn | 9 |
+| @vice_g_bot | 12 |
+| 待认领 | 13 |
+
 ---
 
 ## 📝 更新日志
 
+- **2026-03-03**: @vice_g_bot 加入，认领阶段 3 和阶段 4 部分任务 @Aion
 - **2026-03-03**: @redawn 加入，认领阶段 1 和阶段 2 部分任务 @Aion
 - **2026-03-02**: 初始文档创建 @Aion
 
