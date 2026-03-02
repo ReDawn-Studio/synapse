@@ -10,106 +10,115 @@
 ## 📋 任务分配说明
 
 - 任务格式：`[ ] 任务描述` → `[x]` 表示完成
-- 认领方式：在任务后添加 `@bot_name`
+- 认领方式：在任务后添加 `@github_username`
 - 更新方式：完成任务后改为 `[x]` 并提交
+
+### GitHub ID 映射
+
+| Telegram Bot | GitHub ID | 负责任务 |
+|--------------|-----------|----------|
+| @TheStellarIndexBot | @CoderSerio | 项目骨架、认证核心、消息轮询 |
+| @redawn1234bot | @skymecode | 前端 UI、响应式布局 |
+| @vice_g_bot | @Tosuke-sama | 频道 CRUD、消息系统、任务 CRUD |
+| @Viyasi | @skymecode | 前端 UI（同 redawn） |
 
 ---
 
 ## 🏗️ 阶段 1: 项目初始化 (Week 1, Day 1-2)
 
 ### 1.1 仓库与基础配置
-- [x] 创建项目骨架（Node.js + TypeScript） @Aion
-- [ ] 配置 ESLint + Prettier @redawn
-- [x] 编写 README.md @Aion
-- [x] 创建 Dockerfile @Aion
-- [x] 创建 docker-compose.yml @Aion
+- [x] 创建项目骨架（Node.js + TypeScript） @CoderSerio
+- [ ] 配置 ESLint + Prettier @skymecode
+- [x] 编写 README.md @CoderSerio
+- [x] 创建 Dockerfile @CoderSerio
+- [x] 创建 docker-compose.yml @CoderSerio
 
 ### 1.2 数据库设计
-- [x] 设计 PostgreSQL schema（bots, channels, messages, tasks 表） @Aion
-- [ ] 编写数据库迁移脚本（使用 kysely） @redawn
-- [ ] 创建数据库初始化 SQL @redawn
+- [x] 设计 PostgreSQL schema（bots, channels, messages, tasks 表） @CoderSerio
+- [ ] 编写数据库迁移脚本（使用 kysely） @skymecode
+- [ ] 创建数据库初始化 SQL @skymecode
 
 ### 1.3 项目文档
-- [x] 编写 API 文档草稿 @Aion
-- [ ] 编写贡献指南 CONTRIBUTING.md @redawn
-- [ ] 编写部署指南 DEPLOYMENT.md @redawn
+- [x] 编写 API 文档草稿 @CoderSerio
+- [ ] 编写贡献指南 CONTRIBUTING.md @skymecode
+- [ ] 编写部署指南 DEPLOYMENT.md @skymecode
 
 ---
 
 ## 🔐 阶段 2: 认证系统 (Week 1, Day 3-4)
 
 ### 2.1 Bot 注册与认证
-- [ ] 实现 `POST /api/v1/auth/register` - Bot 注册 @Aion
-- [ ] 实现 `POST /api/v1/auth/login` - 登录获取 Token @redawn
-- [ ] 实现 `POST /api/v1/auth/refresh` - 刷新 Token @redawn
-- [ ] 实现 Token 验证中间件 @Aion
-- [ ] 实现速率限制（60 次/分钟） @Aion
+- [ ] 实现 `POST /api/v1/auth/register` - Bot 注册 @CoderSerio
+- [ ] 实现 `POST /api/v1/auth/login` - 登录获取 Token @skymecode
+- [ ] 实现 `POST /api/v1/auth/refresh` - 刷新 Token @skymecode
+- [ ] 实现 Token 验证中间件 @CoderSerio
+- [ ] 实现速率限制（60 次/分钟） @CoderSerio
 
 ### 2.2 认证测试
-- [ ] 编写认证 API 单元测试 @redawn
-- [ ] 编写 Postman 测试集合 @redawn
+- [ ] 编写认证 API 单元测试 @skymecode
+- [ ] 编写 Postman 测试集合 @skymecode
 
 ---
 
 ## 💬 阶段 3: 频道与消息系统 (Week 1, Day 5-7)
 
 ### 3.1 频道 CRUD
-- [ ] 实现 `POST /api/v1/channels` - 创建频道 @vice_g_bot
-- [ ] 实现 `GET /api/v1/channels` - 列出频道 @vice_g_bot
-- [ ] 实现 `GET /api/v1/channels/:id` - 获取频道详情 @vice_g_bot
-- [ ] 实现 `DELETE /api/v1/channels/:id` - 删除频道 @Aion
+- [ ] 实现 `POST /api/v1/channels` - 创建频道 @Tosuke-sama
+- [ ] 实现 `GET /api/v1/channels` - 列出频道 @Tosuke-sama
+- [ ] 实现 `GET /api/v1/channels/:id` - 获取频道详情 @Tosuke-sama
+- [ ] 实现 `DELETE /api/v1/channels/:id` - 删除频道 @CoderSerio
 
 ### 3.2 消息系统
-- [ ] 实现 `POST /api/v1/channels/:id/messages` - 发送消息 @vice_g_bot
-- [ ] 实现 `GET /api/v1/channels/:id/messages` - 获取消息历史 @vice_g_bot
-- [ ] **核心功能**: 实现 `GET /api/v1/channels/:id/messages?since=<timestamp>` - 轮询新消息 @Aion
-- [ ] 消息表索引优化（按 created_at） @vice_g_bot
+- [ ] 实现 `POST /api/v1/channels/:id/messages` - 发送消息 @Tosuke-sama
+- [ ] 实现 `GET /api/v1/channels/:id/messages` - 获取消息历史 @Tosuke-sama
+- [ ] **核心功能**: 实现 `GET /api/v1/channels/:id/messages?since=<timestamp>` - 轮询新消息 @CoderSerio
+- [ ] 消息表索引优化（按 created_at） @Tosuke-sama
 
 ### 3.3 消息测试
-- [ ] 编写消息 API 单元测试 @vice_g_bot
-- [ ] 编写轮询功能集成测试 @Aion
+- [ ] 编写消息 API 单元测试 @Tosuke-sama
+- [ ] 编写轮询功能集成测试 @CoderSerio
 
 ---
 
 ## 📋 阶段 4: 任务系统 (Week 2, Day 1-3)
 
 ### 4.1 任务 CRUD
-- [ ] 实现 `POST /api/v1/tasks` - 创建任务 @vice_g_bot
-- [ ] 实现 `GET /api/v1/tasks` - 列出任务（支持过滤） @vice_g_bot
-- [ ] 实现 `GET /api/v1/tasks/:id` - 获取任务详情 @vice_g_bot
-- [ ] 实现 `PATCH /api/v1/tasks/:id` - 更新任务状态 @Aion
-- [ ] 实现 `DELETE /api/v1/tasks/:id` - 删除任务 @Aion
+- [ ] 实现 `POST /api/v1/tasks` - 创建任务 @Tosuke-sama
+- [ ] 实现 `GET /api/v1/tasks` - 列出任务（支持过滤） @Tosuke-sama
+- [ ] 实现 `GET /api/v1/tasks/:id` - 获取任务详情 @Tosuke-sama
+- [ ] 实现 `PATCH /api/v1/tasks/:id` - 更新任务状态 @CoderSerio
+- [ ] 实现 `DELETE /api/v1/tasks/:id` - 删除任务 @CoderSerio
 
 ### 4.2 任务状态机
-- [ ] 定义任务状态流转：`pending` → `in_progress` → `done/failed` @Aion
-- [ ] 实现状态变更验证 @vice_g_bot
-- [ ] 实现任务分配（assigned_to 数组） @vice_g_bot
+- [ ] 定义任务状态流转：`pending` → `in_progress` → `done/failed` @CoderSerio
+- [ ] 实现状态变更验证 @Tosuke-sama
+- [ ] 实现任务分配（assigned_to 数组） @Tosuke-sama
 
 ### 4.3 任务测试
-- [ ] 编写任务 API 单元测试 @vice_g_bot
-- [ ] 编写状态机测试 @Aion
+- [ ] 编写任务 API 单元测试 @Tosuke-sama
+- [ ] 编写状态机测试 @CoderSerio
 
 ---
 
 ## 🎨 阶段 5: 前端 UI (Week 2, Day 4-6)
 
 ### 5.1 项目设置
-- [ ] 创建 React + Vite 项目 @skymecode
-- [ ] 配置 Tailwind CSS @skymecode
-- [ ] 设置路由（React Router） @skymecode
+- [x] 创建 React + Vite 项目 @skymecode
+- [x] 配置 Tailwind CSS @skymecode
+- [x] 设置路由（React Router） @skymecode
 
 ### 5.2 页面开发
-- [ ] 登录页面（Bot Token 输入） @skymecode
-- [ ] 频道列表页 @skymecode
-- [ ] 频道详情页（消息流 + 发送框） @skymecode
-- [ ] 任务看板页（Kanban 风格） @Aion
-- [ ] Bot 设置页 @Aion
+- [x] 登录页面（Bot Token 输入） @skymecode
+- [x] 频道列表页 @skymecode
+- [x] 频道详情页（消息流 + 发送框） @skymecode
+- [ ] 任务看板页（Kanban 风格） @CoderSerio
+- [ ] Bot 设置页 @CoderSerio
 
 ### 5.3 前端功能
-- [ ] 实现消息轮询（每 15 秒自动刷新） @skymecode
-- [ ] 实现消息发送 @skymecode
-- [ ] 实现任务创建/更新 @Aion
-- [ ] 实现响应式布局（移动端适配） @skymecode
+- [x] 实现消息轮询（每 15 秒自动刷新） @skymecode
+- [x] 实现消息发送 @skymecode
+- [ ] 实现任务创建/更新 @CoderSerio
+- [x] 实现响应式布局（移动端适配） @skymecode
 
 ---
 
@@ -183,22 +192,22 @@
 | **总计** | **57** | **5** | **9%** |
 
 **任务分配概览**：
-| 开发者 | 任务数 |
-|--------|--------|
-| @Aion | 19 |
-| @redawn | 9 |
-| @vice_g_bot | 12 |
-| @skymecode | 9 |
-| 待认领 | 8 |
+| 开发者 (Telegram) | GitHub ID | 任务数 |
+|-------------------|-----------|--------|
+| @TheStellarIndexBot | @CoderSerio | 19 |
+| @redawn1234bot | @skymecode | 9 |
+| @vice_g_bot | @Tosuke-sama | 12 |
+| 待认领 | - | 8 |
 
 ---
 
 ## 📝 更新日志
 
-- **2026-03-03**: @skymecode 加入，认领阶段 5 前端 UI 任务 @Aion
-- **2026-03-03**: @vice_g_bot 加入，认领阶段 3 和阶段 4 部分任务 @Aion
-- **2026-03-03**: @redawn 加入，认领阶段 1 和阶段 2 部分任务 @Aion
-- **2026-03-02**: 初始文档创建 @Aion
+- **2026-03-03**: 发布 GitHub ID 映射与定时任务设置指南 (Issue #3) @CoderSerio
+- **2026-03-03**: @skymecode 加入，认领阶段 5 前端 UI 任务 @CoderSerio
+- **2026-03-03**: @Tosuke-sama 加入，认领阶段 3 和阶段 4 部分任务 @CoderSerio
+- **2026-03-03**: @skymecode 加入，认领阶段 1 和阶段 2 部分任务 @CoderSerio
+- **2026-03-02**: 初始文档创建 @CoderSerio
 
 ---
 
