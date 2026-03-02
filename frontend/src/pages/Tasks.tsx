@@ -4,8 +4,8 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
-import { SkeletonCard } from '../components/ui/Skeleton';
-import { safeFetch, handleFetchError } from '../utils/apiError';
+import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
+import { safeFetch, handleFetchError, createApiError, type ApiError } from '../utils/apiError';
 
 interface Task {
   id: string;
@@ -46,10 +46,10 @@ const priorityLabels: Record<Task['priority'], string> = {
 };
 
 export default function Tasks() {
-  const { token, apiUrl } = useApi();
+  const { token, apiUrl, setToken } = useApi();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; retryable?: boolean } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
@@ -65,16 +65,24 @@ export default function Tasks() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/tasks`, {
+      
+      const result = await safeFetch(`${apiUrl}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) throw new Error('加载任务失败');
-
-      const data = await res.json();
+      
+      if (result.error) {
+        setError({ message: result.error.message, retryable: result.error.retryable });
+        if (result.error.code === 'UNAUTHORIZED') {
+          setToken(null);
+        }
+        return;
+      }
+      
+      const data = result.data;
       setTasks(Array.isArray(data) ? data : (data.tasks || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      const apiError = handleFetchError(err);
+      setError({ message: apiError.message, retryable: apiError.retryable });
       setTasks([]);
     } finally {
       setLoading(false);
@@ -87,7 +95,7 @@ export default function Tasks() {
 
     try {
       setCreating(true);
-      const res = await fetch(`${apiUrl}/tasks`, {
+      const result = await safeFetch(`${apiUrl}/tasks`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -100,7 +108,9 @@ export default function Tasks() {
         }),
       });
 
-      if (!res.ok) throw new Error('创建任务失败');
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
 
       await loadTasks();
       setShowCreateModal(false);
@@ -116,7 +126,7 @@ export default function Tasks() {
 
   const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
     try {
-      const res = await fetch(`${apiUrl}/tasks/${taskId}`, {
+      const result = await safeFetch(`${apiUrl}/tasks/${taskId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -125,7 +135,9 @@ export default function Tasks() {
         body: JSON.stringify({ status }),
       });
 
-      if (!res.ok) throw new Error('更新失败');
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
 
       await loadTasks();
     } catch (err) {
@@ -137,12 +149,14 @@ export default function Tasks() {
     if (!confirm('确定要删除这个任务吗？')) return;
 
     try {
-      const res = await fetch(`${apiUrl}/tasks/${taskId}`, {
+      const result = await safeFetch(`${apiUrl}/tasks/${taskId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error('删除失败');
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
 
       await loadTasks();
     } catch (err) {
@@ -209,8 +223,24 @@ export default function Tasks() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <Skeleton width="200px" height="36px" />
+              <Skeleton width="150px" height="20px" className="mt-2" />
+            </div>
+            <Skeleton width="100px" height="40px" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-gray-100 rounded-xl p-4">
+                <Skeleton width="120px" height="24px" className="mb-4" />
+                <SkeletonList count={3} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -229,8 +259,16 @@ export default function Tasks() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            ⚠️ {error.message}
+            {error.retryable && (
+              <button
+                onClick={loadTasks}
+                className="ml-2 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                重试 →
+              </button>
+            )}
           </div>
         )}
 
@@ -247,7 +285,19 @@ export default function Tasks() {
                 {tasksByStatus[status].map(task => (
                   <TaskCard key={task.id} task={task} />
                 ))}
-                {tasksByStatus[status].length === 0 && (
+                {tasksByStatus[status].length === 0 && status === 'todo' && (
+                  <div className="text-center py-8">
+                    <div className="text-4xl mb-2">📭</div>
+                    <p className="text-gray-500 text-sm">暂无待办任务</p>
+                    <button
+                      onClick={() => setShowCreateModal(true)}
+                      className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      创建第一个任务 →
+                    </button>
+                  </div>
+                )}
+                {tasksByStatus[status].length === 0 && status !== 'todo' && (
                   <p className="text-center text-gray-500 py-8 text-sm">暂无任务</p>
                 )}
               </div>
