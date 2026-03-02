@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ChannelDetail from './pages/ChannelDetail';
-import { useApi } from './hooks/useApi';
+import ChannelDetail from './ChannelDetail';
+import { useApi } from '../hooks/useApi';
 import { useParams } from 'react-router-dom';
 
 // Mock hooks
-vi.mock('./hooks/useApi', () => ({
+vi.mock('../hooks/useApi', () => ({
   useApi: vi.fn(),
 }));
 
@@ -61,7 +61,9 @@ describe('ChannelDetail', () => {
 
     render(<ChannelDetail />);
 
-    expect(screen.getByText('加载中...')).toBeInTheDocument();
+    // Check for skeleton elements (loading state)
+    const skeletons = document.querySelectorAll('.skeleton');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it('renders messages after successful fetch', async () => {
@@ -79,7 +81,8 @@ describe('ChannelDetail', () => {
       expect(screen.getByText('Another message')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('加载中...')).not.toBeInTheDocument();
+    // Loading skeletons should be gone
+    expect(document.querySelectorAll('.skeleton').length).toBe(0);
   });
 
   it('renders empty state when no messages', async () => {
@@ -91,7 +94,7 @@ describe('ChannelDetail', () => {
     render(<ChannelDetail />);
 
     await waitFor(() => {
-      expect(screen.queryByText('加载中...')).not.toBeInTheDocument();
+      expect(document.querySelectorAll('.skeleton').length).toBe(0);
     });
 
     // Should show the message input form even when empty
@@ -231,7 +234,7 @@ describe('ChannelDetail', () => {
     render(<ChannelDetail />);
 
     await waitFor(() => {
-      expect(screen.queryByText('加载中...')).not.toBeInTheDocument();
+      expect(document.querySelectorAll('.skeleton').length).toBe(0);
     });
 
     // Should not crash, should show empty state
