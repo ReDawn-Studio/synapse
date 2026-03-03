@@ -3,6 +3,7 @@ import request from 'supertest';
 import authRoutes from '../auth';
 import { db } from '../../db/index.js';
 import bcrypt from 'bcrypt';
+import fastifyJwt from '@fastify/jwt';
 
 describe('Auth Routes - Secure Refresh Token', () => {
   let fastify: FastifyInstance;
@@ -11,7 +12,7 @@ describe('Auth Routes - Secure Refresh Token', () => {
 
   beforeAll(async () => {
     fastify = Fastify();
-    fastify.register(require('@fastify/jwt'), { secret: 'test-secret' });
+    fastify.register(fastifyJwt, { secret: 'test-secret' });
     await fastify.register(authRoutes, { prefix: '/api/v1/auth' });
     await fastify.ready();
 
