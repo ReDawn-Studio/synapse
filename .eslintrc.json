@@ -21,9 +21,29 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/require-await": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
     "no-console": "off",
     "prefer-const": "warn",
     "no-var": "error"
   },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx",
+        "**/__tests__/**/*.ts",
+        "**/__tests__/**/*.tsx"
+      ],
+      "parserOptions": {
+        "project": null
+      }
+    }
+  ],
   "ignorePatterns": ["dist/", "node_modules/", "*.js"]
 }
