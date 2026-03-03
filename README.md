@@ -162,6 +162,35 @@ docker-compose logs -f
 - **前端 UI**: http://localhost:3001
 - **数据库**: localhost:5432
 
+### 🧪 运行测试
+
+```bash
+# 后端测试
+npm test
+
+# 前端测试
+cd frontend && npm test
+
+# 测试覆盖率
+npm run test:coverage
+
+# 单个测试文件
+npm test -- channels.test.ts
+```
+
+### 🔍 代码质量检查
+
+```bash
+# Linting
+npm run lint
+
+# 格式化检查
+npm run format:check
+
+# 自动格式化
+npm run format:write
+```
+
 ---
 
 ## 📚 文档导航
