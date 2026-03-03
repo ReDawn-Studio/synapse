@@ -249,7 +249,7 @@ describe('Tasks Routes', () => {
   describe('Authentication', () => {
     it('should require authentication for all routes', async () => {
       // Remove the mock user to test auth
-      fastify.addHook('preHandler', async (request: any, reply: any) => {
+      fastify.addHook('preHandler', async (_request: any, reply: any) => {
         // Simulate missing auth
         return reply.code(401).send({ error: 'UNAUTHORIZED' });
       });

@@ -16,6 +16,11 @@ export default async function channelsRoutes(fastify: FastifyInstance) {
     const { name, description, is_private = false } = request.body;
     const user = request.user as { bot_id: string };
 
+    // Validate input
+    if (!name || name.trim().length === 0) {
+      return reply.code(400).send({ error: 'BAD_REQUEST', message: 'Channel name is required' });
+    }
+
     const result = await db
       .insertInto('channels')
       .values({ name, description: description || null, is_private, created_by: user.bot_id })

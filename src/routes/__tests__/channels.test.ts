@@ -2,22 +2,36 @@ import Fastify, { FastifyInstance } from 'fastify';
 import request from 'supertest';
 import channelsRoutes from '../channels';
 
-// Mock database
+// Mock database - simplified approach
+const mockExecute = jest.fn();
+const mockExecuteTakeFirst = jest.fn();
+
 jest.mock('../../db/index', () => ({
   db: {
-    insertInto: jest.fn().mockReturnThis(),
-    values: jest.fn().mockReturnThis(),
-    returning: jest.fn().mockReturnThis(),
-    executeTakeFirst: jest.fn(),
-    selectFrom: jest.fn().mockReturnThis(),
-    where: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    getAll: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    offset: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    execute: jest.fn(),
-    deleteFrom: jest.fn().mockReturnThis(),
+    selectFrom: jest.fn(() => ({
+      selectAll: jest.fn(() => ({
+        limit: jest.fn(() => ({
+          offset: jest.fn(() => ({
+            orderBy: jest.fn(() => ({
+              execute: mockExecute,
+            })),
+          })),
+        })),
+      })),
+      where: jest.fn(() => ({
+        selectAll: jest.fn(() => ({
+          executeTakeFirst: mockExecuteTakeFirst,
+        })),
+      })),
+    })),
+    insertInto: jest.fn(() => ({
+      values: jest.fn(() => ({
+        returning: jest.fn(() => ({
+          executeTakeFirst: mockExecuteTakeFirst,
+        })),
+      })),
+    })),
+    deleteFrom: jest.fn(),
   },
 }));
 
@@ -26,11 +40,12 @@ describe('Channels Routes', () => {
 
   beforeAll(async () => {
     fastify = Fastify();
-    // Skip JWT verification in tests
-    fastify.decorateRequest('user', null);
-    fastify.addHook('preHandler', async (request: any) => {
-      request.user = { bot_id: 'test-bot' };
+    
+    // Mock jwtVerify BEFORE registering routes - this bypasses actual JWT verification
+    fastify.decorateRequest('jwtVerify', async function() {
+      (this as any).user = { bot_id: 'test-bot' };
     });
+    
     await fastify.register(channelsRoutes, { prefix: '/api/v1/channels' });
     await fastify.ready();
   });
@@ -39,12 +54,16 @@ describe('Channels Routes', () => {
     await fastify.close();
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('GET /api/v1/channels', () => {
     it('should return list of channels', async () => {
       const mockChannels = [
         { id: '1', name: 'General', description: 'General discussion' },
       ];
-      (fastify as any).db.execute.mockResolvedValue(mockChannels);
+      mockExecute.mockResolvedValue(mockChannels);
 
       const response = await request(fastify.server)
         .get('/api/v1/channels');
@@ -54,6 +73,8 @@ describe('Channels Routes', () => {
     });
 
     it('should handle pagination parameters', async () => {
+      mockExecute.mockResolvedValue([]);
+
       const response = await request(fastify.server)
         .get('/api/v1/channels?limit=10&offset=5');
 
@@ -64,13 +85,13 @@ describe('Channels Routes', () => {
   describe('POST /api/v1/channels', () => {
     it('should create a new channel', async () => {
       const mockChannel = { id: '1', name: 'New Channel' };
-      (fastify as any).db.executeTakeFirst.mockResolvedValue(mockChannel);
+      mockExecuteTakeFirst.mockResolvedValue(mockChannel);
 
       const response = await request(fastify.server)
         .post('/api/v1/channels')
         .send({ name: 'New Channel', description: 'Test' });
 
-      expect([201, 500]).toContain(response.status);
+      expect(response.status).toBe(201);
     });
 
     it('should reject request with missing name', async () => {
@@ -78,24 +99,24 @@ describe('Channels Routes', () => {
         .post('/api/v1/channels')
         .send({ description: 'No name' });
 
-      // Should fail validation or database operation
-      expect([400, 500]).toContain(response.status);
+      // Should fail with 400 (bad request - missing required field)
+      expect(response.status).toBe(400);
     });
   });
 
   describe('GET /api/v1/channels/:id', () => {
     it('should return channel details', async () => {
       const mockChannel = { id: '1', name: 'Test Channel' };
-      (fastify as any).db.executeTakeFirst.mockResolvedValue(mockChannel);
+      mockExecuteTakeFirst.mockResolvedValue(mockChannel);
 
       const response = await request(fastify.server)
         .get('/api/v1/channels/1');
 
-      expect([200, 404]).toContain(response.status);
+      expect(response.status).toBe(200);
     });
 
     it('should return 404 for non-existent channel', async () => {
-      (fastify as any).db.executeTakeFirst.mockResolvedValue(undefined);
+      mockExecuteTakeFirst.mockResolvedValue(undefined);
 
       const response = await request(fastify.server)
         .get('/api/v1/channels/nonexistent');
