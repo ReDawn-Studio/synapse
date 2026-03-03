@@ -3,24 +3,26 @@ import request from 'supertest';
 import tasksRoutes from '../tasks';
 
 // Mock database
-jest.mock('../../db/index', () => ({
-  db: {
-    insertInto: jest.fn().mockReturnThis(),
-    values: jest.fn().mockReturnThis(),
-    returning: jest.fn().mockReturnThis(),
-    executeTakeFirst: jest.fn(),
-    selectFrom: jest.fn().mockReturnThis(),
-    where: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    getAll: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    offset: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    execute: jest.fn(),
-    updateTable: jest.fn().mockReturnThis(),
-    set: jest.fn().mockReturnThis(),
-    deleteFrom: jest.fn().mockReturnThis(),
-  },
+const mockDb = {
+  insertInto: jest.fn().mockReturnThis(),
+  values: jest.fn().mockReturnThis(),
+  returning: jest.fn().mockReturnThis(),
+  executeTakeFirst: jest.fn(),
+  selectFrom: jest.fn().mockReturnThis(),
+  where: jest.fn().mockReturnThis(),
+  select: jest.fn().mockReturnThis(),
+  getAll: jest.fn().mockReturnThis(),
+  limit: jest.fn().mockReturnThis(),
+  offset: jest.fn().mockReturnThis(),
+  orderBy: jest.fn().mockReturnThis(),
+  execute: jest.fn(),
+  updateTable: jest.fn().mockReturnThis(),
+  set: jest.fn().mockReturnThis(),
+  deleteFrom: jest.fn().mockReturnThis(),
+};
+
+jest.mock('../../db/index.js', () => ({
+  db: mockDb,
 }));
 
 describe('Tasks Routes', () => {
@@ -28,6 +30,8 @@ describe('Tasks Routes', () => {
 
   beforeAll(async () => {
     fastify = Fastify();
+    // Mock db on fastify instance
+    (fastify as any).db = mockDb;
     // Skip JWT verification in tests
     fastify.decorateRequest('user', null);
     fastify.addHook('preHandler', async (request: any) => {

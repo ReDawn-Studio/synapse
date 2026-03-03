@@ -3,23 +3,19 @@
  * 覆盖频道消息的发送、获取、删除功能
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import Fastify from 'fastify';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
+import Fastify, { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
-import { db, runMigrations, dropAllTables } from '../../db/index.js';
 import channelsRoutes from '../channels.js';
 import authRoutes from '../auth.js';
 
 describe('Messages API', () => {
-  let fastify: Fastify.FastifyInstance;
+  let fastify: FastifyInstance;
   let authToken: string;
   let channelId: string;
   let messageId: string;
 
   beforeAll(async () => {
-    // 初始化数据库
-    await runMigrations();
-
     // 创建 Fastify 实例
     fastify = Fastify({ logger: false });
 
@@ -35,7 +31,6 @@ describe('Messages API', () => {
 
   afterAll(async () => {
     await fastify.close();
-    await dropAllTables();
   });
 
   beforeEach(async () => {
