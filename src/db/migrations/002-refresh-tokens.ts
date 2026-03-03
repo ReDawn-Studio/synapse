@@ -5,11 +5,15 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('bot_refresh_tokens')
     .ifNotExists()
-    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(db.getExpressionBuilder().fn('gen_random_uuid')))
+    .addColumn('id', 'uuid', (col) =>
+      col.primaryKey().defaultTo(db.getExpressionBuilder().fn('gen_random_uuid'))
+    )
     .addColumn('bot_id', 'uuid', (col) => col.notNull().references('bots.id').onDelete('cascade'))
     .addColumn('token_hash', 'varchar(64)', (col) => col.notNull().unique())
     .addColumn('expires_at', 'timestamptz', (col) => col.notNull())
-    .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(db.getExpressionBuilder().fn('now')))
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(db.getExpressionBuilder().fn('now'))
+    )
     .addColumn('revoked_at', 'timestamptz')
     .addColumn('last_used_at', 'timestamptz')
     .execute();

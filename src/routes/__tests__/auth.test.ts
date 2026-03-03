@@ -26,12 +26,10 @@ describe('Auth Routes', () => {
     });
 
     it('should accept registration with valid name', async () => {
-      const response = await request(fastify.server)
-        .post('/api/v1/auth/register')
-        .send({ 
-          name: 'test-bot',
-          description: 'A test bot'
-        });
+      const response = await request(fastify.server).post('/api/v1/auth/register').send({
+        name: 'test-bot',
+        description: 'A test bot',
+      });
 
       // Note: This will fail without database connection
       // In real tests, we'd mock the database
