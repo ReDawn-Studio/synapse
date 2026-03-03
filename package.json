@@ -10,7 +10,9 @@
     "lint": "eslint src --ext .ts",
     "test": "jest",
     "db:migrate": "tsx src/db/migrate.ts",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "format:check": "prettier --check \"src/**/*.{ts,js}\"",
+    "format:write": "prettier --write \"src/**/*.{ts,js}\""
   },
   "keywords": [
     "ai",

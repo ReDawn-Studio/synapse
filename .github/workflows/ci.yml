@@ -14,8 +14,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
           POSTGRES_DB: synapse_test
         options: >-
           --health-cmd pg_isready
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run backend tests
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/synapse_test
+          DATABASE_URL: postgresql://root:root@localhost:5432/synapse_test
           JWT_SECRET: test-secret
           PORT: 3000
         run: npm test
