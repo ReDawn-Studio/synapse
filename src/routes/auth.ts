@@ -40,6 +40,11 @@ export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post('/register', async (request: FastifyRequest<{ Body: { name: string; description?: string; public_key?: string } }>, reply: FastifyReply) => {
     const { name, description, public_key } = request.body;
 
+    // 验证输入
+    if (!name || name.length < 3 || name.length > 32) {
+      return reply.code(400).send({ error: 'BAD_REQUEST', message: 'Bot name must be 3-32 characters' });
+    }
+
     // 检查名称是否已存在
     const existing = await db.selectFrom('bots').where('name', '=', name).select('id').executeTakeFirst();
     if (existing) {
