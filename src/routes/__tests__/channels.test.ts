@@ -40,12 +40,12 @@ describe('Channels Routes', () => {
 
   beforeAll(async () => {
     fastify = Fastify();
-    
+
     // Mock jwtVerify BEFORE registering routes - this bypasses actual JWT verification
-    fastify.decorateRequest('jwtVerify', async function() {
+    fastify.decorateRequest('jwtVerify', async function () {
       (this as any).user = { bot_id: 'test-bot' };
     });
-    
+
     await fastify.register(channelsRoutes, { prefix: '/api/v1/channels' });
     await fastify.ready();
   });
@@ -60,13 +60,10 @@ describe('Channels Routes', () => {
 
   describe('GET /api/v1/channels', () => {
     it('should return list of channels', async () => {
-      const mockChannels = [
-        { id: '1', name: 'General', description: 'General discussion' },
-      ];
+      const mockChannels = [{ id: '1', name: 'General', description: 'General discussion' }];
       mockExecute.mockResolvedValue(mockChannels);
 
-      const response = await request(fastify.server)
-        .get('/api/v1/channels');
+      const response = await request(fastify.server).get('/api/v1/channels');
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
@@ -75,8 +72,7 @@ describe('Channels Routes', () => {
     it('should handle pagination parameters', async () => {
       mockExecute.mockResolvedValue([]);
 
-      const response = await request(fastify.server)
-        .get('/api/v1/channels?limit=10&offset=5');
+      const response = await request(fastify.server).get('/api/v1/channels?limit=10&offset=5');
 
       expect(response.status).toBe(200);
     });
@@ -109,8 +105,7 @@ describe('Channels Routes', () => {
       const mockChannel = { id: '1', name: 'Test Channel' };
       mockExecuteTakeFirst.mockResolvedValue(mockChannel);
 
-      const response = await request(fastify.server)
-        .get('/api/v1/channels/1');
+      const response = await request(fastify.server).get('/api/v1/channels/1');
 
       expect(response.status).toBe(200);
     });
@@ -118,8 +113,7 @@ describe('Channels Routes', () => {
     it('should return 404 for non-existent channel', async () => {
       mockExecuteTakeFirst.mockResolvedValue(undefined);
 
-      const response = await request(fastify.server)
-        .get('/api/v1/channels/nonexistent');
+      const response = await request(fastify.server).get('/api/v1/channels/nonexistent');
 
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('error', 'NOT_FOUND');

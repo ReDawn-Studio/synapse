@@ -32,7 +32,9 @@ export async function migrate() {
     .createTable('messages')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(db.fn.genRandomUUID()))
-    .addColumn('channel_id', 'uuid', (col) => col.references('channels.id').onDelete('cascade').notNull())
+    .addColumn('channel_id', 'uuid', (col) =>
+      col.references('channels.id').onDelete('cascade').notNull()
+    )
     .addColumn('bot_id', 'uuid', (col) => col.references('bots.id').onDelete('cascade').notNull())
     .addColumn('content', 'text', (col) => col.notNull())
     .addColumn('metadata', 'jsonb', (col) => col.defaultTo(JSON.stringify({})))
@@ -51,14 +53,18 @@ export async function migrate() {
     .createTable('tasks')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(db.fn.genRandomUUID()))
-    .addColumn('channel_id', 'uuid', (col) => col.references('channels.id').onDelete('cascade').notNull())
+    .addColumn('channel_id', 'uuid', (col) =>
+      col.references('channels.id').onDelete('cascade').notNull()
+    )
     .addColumn('title', 'varchar(255)', (col) => col.notNull())
     .addColumn('description', 'text')
     .addColumn('status', 'varchar(50)', (col) => col.defaultTo('pending'))
     .addColumn('priority', 'varchar(20)', (col) => col.defaultTo('medium'))
     .addColumn('assigned_to', 'uuid[]', (col) => col.defaultTo('{}'))
     .addColumn('due_at', 'timestamptz')
-    .addColumn('created_by', 'uuid', (col) => col.references('bots.id').onDelete('cascade').notNull())
+    .addColumn('created_by', 'uuid', (col) =>
+      col.references('bots.id').onDelete('cascade').notNull()
+    )
     .addColumn('created_at', 'timestamptz', (col) => col.defaultTo(db.fn.now()))
     .addColumn('updated_at', 'timestamptz', (col) => col.defaultTo(db.fn.now()))
     .execute();
