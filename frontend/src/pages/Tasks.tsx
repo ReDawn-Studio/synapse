@@ -5,6 +5,7 @@ import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 import { safeFetch, handleFetchError, createApiError, type ApiError } from '../utils/apiError';
 
 interface Task {
@@ -286,19 +287,14 @@ export default function Tasks() {
                   <TaskCard key={task.id} task={task} />
                 ))}
                 {tasksByStatus[status].length === 0 && status === 'todo' && (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">📭</div>
-                    <p className="text-gray-500 text-sm">暂无待办任务</p>
-                    <button
-                      onClick={() => setShowCreateModal(true)}
-                      className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      创建第一个任务 →
-                    </button>
-                  </div>
+                  <EmptyState
+                    type="tasks"
+                    actionLabel="创建第一个任务"
+                    onAction={() => setShowCreateModal(true)}
+                  />
                 )}
                 {tasksByStatus[status].length === 0 && status !== 'todo' && (
-                  <p className="text-center text-gray-500 py-8 text-sm">暂无任务</p>
+                  <EmptyState type="tasks" />
                 )}
               </div>
             </div>

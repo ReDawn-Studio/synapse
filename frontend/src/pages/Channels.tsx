@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 import { safeFetch, createApiError, handleFetchError } from '../utils/apiError';
 
 interface Channel {
@@ -154,16 +155,11 @@ export default function Channels() {
         )}
 
         {channels.length === 0 && !error ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📭</div>
-            <p className="text-slate-500 mb-4">暂无频道</p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              创建第一个频道 →
-            </button>
-          </div>
+          <EmptyState
+            type="channels"
+            actionLabel="创建第一个频道"
+            onAction={() => setShowCreateModal(true)}
+          />
         ) : (
           <div className="grid gap-4">
             {channels.map(channel => (
